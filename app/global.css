@@ -8,7 +8,27 @@ body {
     height: 100%;
 }
 
+:root {
+    --color-primary: #BA7517;
+    --color-primary-light: #FAEEDA;
+    --color-primary-mid: #FAC775;
+    --color-primary-dark: #854F0B;
+    --color-primary-darker: #412402;
+    --color-pin-default: #ffffff;
+    --color-pin-border: #d1d5db;
+}
+
 .leaflet-container {
     width: 100%;
     height: 100%;
+}
+
+.zentry-pin {
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+}
+
+.zentry-pin div {
+    pointer-events: auto !important;
 }

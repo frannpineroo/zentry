@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { useEffect } from 'react'
+import { MapContainer, TileLayer, useMap } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+import { Property } from '@/types'
+import { mockProperties } from '@/lib/mock-properties'
+import PropertyPin from './PropertyPin'
 
-// Fix del icono de Lefalet que se rompe con webpack
 const fixLeafletIcons = () => {
-    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    delete (L.Icon.Default.prototype as any)._getIconUrl
     L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
         iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -16,17 +18,20 @@ const fixLeafletIcons = () => {
 }
 
 function MapController() {
-    const map = useMap();
-
+    const map = useMap()
     useEffect(() => {
-        fixLeafletIcons();
-        map.invalidateSize();
-    }, [map]);
-
-    return null;
+        fixLeafletIcons()
+        map.invalidateSize()
+    }, [map])
+    return null
 }
 
-export default function MapComponent() {
+interface Props {
+    selectedId: string | null
+    onPinClick: (property: Property) => void
+}
+
+export default function MapComponent({ selectedId, onPinClick }: Props) {
     return (
         <MapContainer
             center={[-31.4167, -64.1833]}
@@ -39,6 +44,14 @@ export default function MapComponent() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapController />
+            {mockProperties.map((property) => (
+                <PropertyPin
+                    key={property.id}
+                    property={property}
+                    isSelected={selectedId === property.id}
+                    onClick={onPinClick}
+                />
+            ))}
         </MapContainer>
     )
 }
