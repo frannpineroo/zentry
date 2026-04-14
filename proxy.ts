@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request })
 
     const supabase = createServerClient(
@@ -27,7 +27,6 @@ export async function middleware(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Rutas que requieren estar logueado
     const protectedRoutes = ['/profile', '/properties/new']
     const isProtected = protectedRoutes.some(route =>
         request.nextUrl.pathname.startsWith(route)
@@ -37,7 +36,6 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // Si ya está logueado no necesita ir al login
     if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
         return NextResponse.redirect(new URL('/', request.url))
     }
