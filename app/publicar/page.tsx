@@ -11,14 +11,15 @@ export const metadata: Metadata = {
 
 export default async function PublishPage() {
     // Protect the route — redirect to login if not authenticated
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
                 get(name: string) {
-                    return cookieStore.get(name)?.value
+                    const cookie = cookieStore.get(name)
+                    return cookie?.value || null
                 },
             },
         }
