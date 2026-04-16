@@ -21,21 +21,21 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
 
     const handleSuccess = async (data: NewPropertyFormData) => {
         // 1. Upload images to Supabase Storage
-        const imageUrls: string[] = []
-        for (const file of data.images) {
-            const ext = file.name.split('.').pop()
-            const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-            const { data: uploadData, error } = await supabase.storage
-                .from('property-images')
-                .upload(path, file, { upsert: false })
+        // const imageUrls: string[] = []
+        // for (const file of data.images) {
+        //     const ext = file.name.split('.').pop()
+        //     const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        //     const { data: uploadData, error } = await supabase.storage
+        //         .from('property-images')
+        //         .upload(path, file, { upsert: false })
 
-            if (!error && uploadData) {
-                const { data: urlData } = supabase.storage
-                    .from('property-images')
-                    .getPublicUrl(uploadData.path)
-                imageUrls.push(urlData.publicUrl)
-            }
-        }
+        //     if (!error && uploadData) {
+        //         const { data: urlData } = supabase.storage
+        //             .from('property-images')
+        //             .getPublicUrl(uploadData.path)
+        //         imageUrls.push(urlData.publicUrl)
+        //     }
+        // }
 
         // 2. Insert property into DB
         const { data: property, error } = await supabase
@@ -50,12 +50,12 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
                 type: data.type,
                 bedrooms: data.bedrooms ? Number(data.bedrooms) : null,
                 bathrooms: data.bathrooms ? Number(data.bathrooms) : null,
-                area: Number(data.area),
+                area_m2: Number(data.area_m2),
                 lat: data.location!.lat,
                 lng: data.location!.lng,
                 address: data.location!.address,
                 neighborhood: data.location!.neighborhood || null,
-                images: imageUrls,
+                // images: imageUrls,
                 status: 'active',
             })
             .select('id')

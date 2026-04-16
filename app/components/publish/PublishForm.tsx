@@ -33,9 +33,9 @@ const EMPTY_FORM: NewPropertyFormData = {
     type: 'departamento',
     bedrooms: '',
     bathrooms: '',
-    area: '',
+    area_m2: '',
     location: null,
-    images: [],
+    // images: [],
 }
 
 interface PublishFormProps {
@@ -54,20 +54,20 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
         setErrors((e) => ({ ...e, [key]: undefined }))
     }
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || [])
-        set('images', [...form.images, ...files].slice(0, 8))
-    }
+    // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const files = Array.from(e.target.files || [])
+    //     set('images', [...form.images, ...files].slice(0, 8))
+    // }
 
-    const removeImage = (idx: number) => {
-        set('images', form.images.filter((_, i) => i !== idx))
-    }
+    // const removeImage = (idx: number) => {
+    //     set('images', form.images.filter((_, i) => i !== idx))
+    // }
 
     const validate = (): boolean => {
         const errs: typeof errors = {}
         if (!form.title.trim()) errs.title = 'Requerido'
         if (!form.price || isNaN(Number(form.price))) errs.price = 'Ingresá un precio válido'
-        if (!form.area || isNaN(Number(form.area))) errs.area = 'Ingresá los m²'
+        if (!form.area_m2 || isNaN(Number(form.area_m2))) errs.area_m2 = 'Ingresá los m²'
         if (!form.location) errs.location = 'Elegí la ubicación en el mapa'
         setErrors(errs)
         return Object.keys(errs).length === 0
@@ -207,15 +207,15 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
 
                             {/* Área + ambientes */}
                             <div className="grid grid-cols-3 gap-3">
-                                <Field label="Superficie (m²)" error={errors.area}>
+                                <Field label="Superficie (m²)" error={errors.area_m2}>
                                     <input
-                                        value={form.area}
-                                        onChange={(e) => set('area', e.target.value)}
+                                        value={form.area_m2}
+                                        onChange={(e) => set('area_m2', e.target.value)}
                                         placeholder="65"
                                         type="number"
                                         min="0"
                                         className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                                        style={inputStyle(!!errors.area)}
+                                        style={inputStyle(!!errors.area_m2)}
                                     />
                                 </Field>
                                 <Field label="Dormitorios">
@@ -303,7 +303,7 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
                                 </div>
                             </Field>
 
-                            {/* Fotos */}
+                            {/* Fotos
                             <Field label={`Fotos (${form.images.length}/8)`}>
                                 <div className="grid grid-cols-4 gap-2">
                                     {form.images.map((file, i) => (
@@ -342,7 +342,7 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
                                         </label>
                                     )}
                                 </div>
-                            </Field>
+                            </Field> */}
                         </>
                     )}
                 </div>

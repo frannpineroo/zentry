@@ -18,9 +18,9 @@ export interface NewPropertyFormData {
     type: PropertyType
     bedrooms: string
     bathrooms: string
-    area: string
+    area_m2: string
     location: PropertyLocation | null
-    images: File[]
+    // images: File[]
 }
 
 export const PROPERTY_TYPES: { value: PropertyType; label: string }[] = [
