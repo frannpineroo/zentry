@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import PublishFormWrapper from '@/components/publish/PublishFormWrapper'
+import PublishFormWrapper from '../components/publish/PublishFormWrapper'
 
 export const metadata: Metadata = {
     title: 'Publicar propiedad · Zentry',
