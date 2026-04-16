@@ -22,6 +22,8 @@ export default function MapPicker({ value, onChange }: MapPickerProps) {
     useEffect(() => {
         if (!mapRef.current || mapInstanceRef.current) return
 
+        mapInstanceRef.current = 'initializing'
+
         // Dynamically import Leaflet (SSR-safe)
         import('leaflet').then((L) => {
             // Fix default icon paths for Next.js
@@ -31,6 +33,12 @@ export default function MapPicker({ value, onChange }: MapPickerProps) {
                 iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
                 shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
             })
+
+            const container = mapRef.current as any
+
+            if (container._leaflet_id) {
+                container._leaflet_id = null
+            }
 
             const map = L.map(mapRef.current!, {
                 center: CORDOBA_CENTER,
@@ -43,6 +51,9 @@ export default function MapPicker({ value, onChange }: MapPickerProps) {
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
             }).addTo(map)
+
+            mapInstanceRef.current = map
+            setIsReady(true)
 
             // Custom amber pin icon
             const amberIcon = L.divIcon({
@@ -108,15 +119,13 @@ export default function MapPicker({ value, onChange }: MapPickerProps) {
                 }
             })
 
-            mapInstanceRef.current = map
-            setIsReady(true)
         })
 
         return () => {
-            if (mapInstanceRef.current) {
+            if (mapInstanceRef.current && mapInstanceRef.current !== 'initializing') {
                 mapInstanceRef.current.remove()
-                mapInstanceRef.current = null
             }
+            mapInstanceRef.current = null
         }
     }, [])
 
