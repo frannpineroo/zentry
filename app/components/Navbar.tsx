@@ -40,7 +40,7 @@ export default function Navbar() {
                             {user.email}
                         </span>
                         <Link
-                            href="/properties/new"
+                            href="/publicar"
                             className="text-sm px-4 py-1.5 rounded-lg text-white transition-colors"
                             style={{ backgroundColor: '#BA7517' }}
                         >
