@@ -35,7 +35,7 @@ const EMPTY_FORM: NewPropertyFormData = {
     bathrooms: '',
     area_m2: '',
     location: null,
-    // images: [],
+    images: [],
 }
 
 interface PublishFormProps {
@@ -54,14 +54,14 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
         setErrors((e) => ({ ...e, [key]: undefined }))
     }
 
-    // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const files = Array.from(e.target.files || [])
-    //     set('images', [...form.images, ...files].slice(0, 8))
-    // }
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || [])
+        set('images', [...form.images, ...files].slice(0, 8))
+    }
 
-    // const removeImage = (idx: number) => {
-    //     set('images', form.images.filter((_, i) => i !== idx))
-    // }
+    const removeImage = (idx: number) => {
+        set('images', form.images.filter((_, i) => i !== idx))
+    }
 
     const validate = (): boolean => {
         const errs: typeof errors = {}
@@ -303,7 +303,7 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
                                 </div>
                             </Field>
 
-                            {/* Fotos
+                            Fotos
                             <Field label={`Fotos (${form.images.length}/8)`}>
                                 <div className="grid grid-cols-4 gap-2">
                                     {form.images.map((file, i) => (
@@ -342,7 +342,7 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
                                         </label>
                                     )}
                                 </div>
-                            </Field> */}
+                            </Field>
                         </>
                     )}
                 </div>

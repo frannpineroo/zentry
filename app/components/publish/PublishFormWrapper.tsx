@@ -20,23 +20,7 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
     )
 
     const handleSuccess = async (data: NewPropertyFormData) => {
-        // 1. Upload images to Supabase Storage
-        // const imageUrls: string[] = []
-        // for (const file of data.images) {
-        //     const ext = file.name.split('.').pop()
-        //     const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        //     const { data: uploadData, error } = await supabase.storage
-        //         .from('property-images')
-        //         .upload(path, file, { upsert: false })
-
-        //     if (!error && uploadData) {
-        //         const { data: urlData } = supabase.storage
-        //             .from('property-images')
-        //             .getPublicUrl(uploadData.path)
-        //         imageUrls.push(urlData.publicUrl)
-        //     }
-        // }
-
+        // 0. Garantizar que el perfil existe
         const { error: profileError } = await supabase
             .from('profiles')
             .upsert({ id: userId }, { onConflict: 'id' })
@@ -46,7 +30,7 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
             return
         }
 
-        // 2. Insert property into DB
+        // 1. Insert property
         const { data: property, error } = await supabase
             .from('properties')
             .insert({
@@ -64,7 +48,6 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
                 lng: data.location!.lng,
                 address: data.location!.address,
                 neighborhood: data.location!.neighborhood || null,
-                // images: imageUrls,
                 status: 'active',
             })
             .select('id')
@@ -75,10 +58,37 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
             return
         }
 
+        // 2. Upload images y guardar en property_images
+        if (data.images && data.images.length > 0) {
+            for (let i = 0; i < data.images.length; i++) {
+                const file = data.images[i]
+                const ext = file.name.split('.').pop()
+                const path = `${userId}/${property.id}/${Date.now()}-${i}.${ext}`
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('property-images')
+                    .upload(path, file, { upsert: false })
+
+                if (uploadError) {
+                    console.error('Error uploading image:', uploadError)
+                    continue
+                }
+
+                const { data: urlData } = supabase.storage
+                    .from('property-images')
+                    .getPublicUrl(uploadData.path)
+
+                await supabase.from('property_images').insert({
+                    property_id: property.id,
+                    url: urlData.publicUrl,
+                    order_index: i,
+                })
+            }
+        }
+
         setSuccessId(property.id)
-        // Redirect to the new listing after a short delay
         setTimeout(() => {
-            router.push(`/`)
+            router.push('/')
         }, 1500)
     }
 
