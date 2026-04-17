@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { Property } from '@/types'
-import { mockProperties } from '@/lib/mock-properties'
 import PropertyPin from './PropertyPin'
 
 const fixLeafletIcons = () => {
@@ -27,11 +26,20 @@ function MapController() {
 }
 
 interface Props {
+    properties: Property[]
     selectedId: string | null
     onPinClick: (property: Property) => void
 }
 
-export default function MapComponent({ selectedId, onPinClick }: Props) {
+export default function MapComponent({ properties, selectedId, onPinClick }: Props) {
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) return null
+
     return (
         <MapContainer
             center={[-31.4167, -64.1833]}
@@ -44,7 +52,7 @@ export default function MapComponent({ selectedId, onPinClick }: Props) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapController />
-            {mockProperties.map((property) => (
+            {properties.map((property) => (
                 <PropertyPin
                     key={property.id}
                     property={property}

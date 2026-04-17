@@ -78,7 +78,7 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
         setSuccessId(property.id)
         // Redirect to the new listing after a short delay
         setTimeout(() => {
-            router.push(`/propiedades/${property.id}`)
+            router.push(`/`)
         }, 1500)
     }
 

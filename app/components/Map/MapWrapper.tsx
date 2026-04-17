@@ -1,7 +1,8 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 import { Property } from '@/types'
 import PropertyCard from './PropertyCard'
 
@@ -19,10 +20,39 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
 
 export default function MapWrapper() {
     const [selected, setSelected] = useState<Property | null>(null)
+    const [properties, setProperties] = useState<Property[]>([])
+
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+
+    useEffect(() => {
+        const fetchProperties = async () => {
+            const { data, error } = await supabase
+                .from('properties')
+                .select(`
+        *,
+        profiles!properties_user_id_fkey (id, full_name, phone, avatar_url, created_at),
+        property_images (id, property_id, url, order_index)
+    `)
+                .eq('status', 'active')
+
+            if (error) {
+                console.error('Error fetching properties:', error)
+                return
+            }
+
+            setProperties(data as Property[])
+        }
+
+        fetchProperties()
+    }, [])
 
     return (
         <div className="w-full h-full relative">
             <MapComponent
+                properties={properties}
                 selectedId={selected?.id ?? null}
                 onPinClick={setSelected}
             />
