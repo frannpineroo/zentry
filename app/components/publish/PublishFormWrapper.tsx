@@ -37,6 +37,15 @@ export default function PublishFormWrapper({ userId }: PublishFormWrapperProps) 
         //     }
         // }
 
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert({ id: userId }, { onConflict: 'id' })
+
+        if (profileError) {
+            console.error('Error ensuring profile:', profileError)
+            return
+        }
+
         // 2. Insert property into DB
         const { data: property, error } = await supabase
             .from('properties')
