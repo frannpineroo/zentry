@@ -36,9 +36,6 @@ export default function Navbar() {
             <nav className="flex items-center gap-3">
                 {user ? (
                     <>
-                        <span className="text-sm text-gray-500 hidden sm:block">
-                            {user.email}
-                        </span>
                         <Link
                             href="/publicar"
                             className="text-sm px-4 py-1.5 rounded-lg text-white transition-colors"
@@ -46,12 +43,13 @@ export default function Navbar() {
                         >
                             Publicar
                         </Link>
-                        <button
-                            onClick={handleLogout}
+                        <Link
+                            href="/profile"
                             className="text-sm px-4 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                            Salir
-                        </button>
+                            Mi perfil
+                        </Link>
+
                     </>
                 ) : (
                     <>
