@@ -178,7 +178,6 @@ export default function PublishForm({ onSuccess, onCancel }: PublishFormProps) {
                                                     : { background: '#f0e8d8', color: '#7a6040' }
                                             }
                                         >
-                                            <span style={{ fontSize: 18 }}>{t.icon}</span>
                                             {t.label}
                                         </button>
                                     ))}
