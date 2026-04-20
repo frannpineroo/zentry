@@ -3,6 +3,7 @@
 import { Search } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import type { PropertyFilters, PropertyType, OperationType } from '@/types'
+import { createPortal } from 'react-dom'
 
 const OPERATIONS: { label: string; value: OperationType }[] = [
     { label: 'Venta', value: 'venta' },
@@ -37,7 +38,7 @@ export default function SearchBar({ filters, onFiltersChange }: Props) {
         onFiltersChange({ ...filters, [key]: filters[key] === value ? undefined : value })
 
     return (
-        <div className="w-full bg-white border-b border-gray-100 px-4 py-2.5 flex items-center gap-2 flex-wrap z-40">
+        <div className="w-full bg-white border-b border-gray-100 px-4 py-2.5 flex items-center gap-2 flex-wrap z-50 relative">
             {/* Search input */}
             <div className="flex items-center gap-2 flex-1 min-w-48 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
                 <Search size={14} className="text-gray-400 shrink-0" />
@@ -103,20 +104,29 @@ function FilterPill({
     options: { label: string; selected: boolean; onClick: () => void }[]
 }) {
     const [open, setOpen] = useState(false)
+    const [coords, setCoords] = useState({ top: 0, left: 0 })
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
             if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
         }
-        document.addEventListener('mousedown', handler)
-        return () => document.removeEventListener('mousedown', handler)
+        document.addEventListener('click', handler)
+        return () => document.removeEventListener('click', handler)
     }, [])
+
+    const handleOpen = () => {
+        if (ref.current) {
+            const rect = ref.current.getBoundingClientRect()
+            setCoords({ top: rect.bottom + 4, left: rect.left })
+        }
+        setOpen((o) => !o)
+    }
 
     return (
         <div className="relative" ref={ref}>
             <button
-                onClick={() => setOpen((o) => !o)}
+                onClick={handleOpen}
                 className="text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1"
                 style={
                     active
@@ -128,8 +138,11 @@ function FilterPill({
                 <span className="text-xs" style={{ color: active ? '#854F0B' : '#d1d5db' }}>▾</span>
             </button>
 
-            {open && (
-                <div className="absolute top-full mt-1 left-0 bg-white border border-gray-100 rounded-xl shadow-lg p-1.5 z-50 min-w-32">
+            {open && createPortal(
+                <div
+                    className="bg-white border border-gray-100 rounded-xl shadow-lg p-1.5 min-w-32"
+                    style={{ position: 'fixed', top: coords.top, left: coords.left, zIndex: 99999 }}
+                >
                     {options.map((opt) => (
                         <button
                             key={opt.label}
@@ -144,7 +157,8 @@ function FilterPill({
                             {opt.label}
                         </button>
                     ))}
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     )
