@@ -2,6 +2,7 @@
 
 import { X, BedDouble, Bath, Maximize2 } from 'lucide-react'
 import { Property } from '@/types'
+import Link from 'next/link'
 
 interface Props {
     property: Property
@@ -54,6 +55,14 @@ export default function PropertyCard({ property, onClose }: Props) {
                         </span>
                     )}
                 </div>
+
+                <Link
+                    href={`/properties/${property.id}`}
+                    className="mt-2.5 w-full flex items-center justify-center gap-2 py-1.5 rounded-xl text-xs font-medium transition-colors"
+                    style={{ background: '#1a1208', color: '#fff' }}
+                >
+                    Ver detalle
+                </Link>
 
                 <a
                     href={whatsappUrl}

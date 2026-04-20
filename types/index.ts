@@ -51,3 +51,12 @@ export interface Favorite {
     property_id: string
     created_at: string
 }
+
+export interface PropertyFilters {
+    operation?: OperationType
+    type?: PropertyType
+    minPrice?: number
+    maxPrice?: number
+    minBedrooms?: number
+    search?: string
+}
