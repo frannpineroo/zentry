@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
-import { Property } from '@/types'
+import { Property, PropertyFilters } from '@/types'
 import PropertyCard from './PropertyCard'
 
 const MapComponent = dynamic(() => import('./MapComponent'), {
@@ -18,7 +18,11 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
     )
 })
 
-export default function MapWrapper() {
+interface Props {
+    filters: PropertyFilters
+}
+
+export default function MapWrapper({ filters }: Props) {
     const [selected, setSelected] = useState<Property | null>(null)
     const [properties, setProperties] = useState<Property[]>([])
 
@@ -29,14 +33,25 @@ export default function MapWrapper() {
 
     useEffect(() => {
         const fetchProperties = async () => {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('properties')
                 .select(`
-        *,
-        profiles!properties_user_id_fkey (id, full_name, phone, avatar_url, created_at),
-        property_images (id, property_id, url, order_index)
-    `)
+                    *,
+                    profiles!properties_user_id_fkey (id, full_name, phone, avatar_url, created_at),
+                    property_images (id, property_id, url, order_index)
+                `)
                 .eq('status', 'active')
+
+            if (filters.operation) query = query.eq('operation', filters.operation)
+            if (filters.type) query = query.eq('type', filters.type)
+            if (filters.minPrice) query = query.gte('price', filters.minPrice)
+            if (filters.maxPrice) query = query.lte('price', filters.maxPrice)
+            if (filters.minBedrooms) query = query.gte('bedrooms', filters.minBedrooms)
+            if (filters.search) query = query.or(
+                `address.ilike.%${filters.search}%,neighborhood.ilike.%${filters.search}%,title.ilike.%${filters.search}%`
+            )
+
+            const { data, error } = await query
 
             if (error) {
                 console.error('Error fetching properties:', error)
@@ -47,7 +62,7 @@ export default function MapWrapper() {
         }
 
         fetchProperties()
-    }, [])
+    }, [filters])
 
     return (
         <div className="w-full h-full relative">
@@ -56,7 +71,6 @@ export default function MapWrapper() {
                 selectedId={selected?.id ?? null}
                 onPinClick={setSelected}
             />
-
             {selected && (
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] w-80">
                     <PropertyCard
